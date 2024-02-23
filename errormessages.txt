@@ -1,0 +1,9 @@
+arguments error = Usage: Maze <filename>
+file handling error = Error: Bad filename
+data format = Error: CSV file does not have the expected format
+file loaded succesfully = "File data/original.csv successfully loaded"
+invalid character movement = Error : Invalid Movement character
+movement into walls = Alert Cannot Move into the Walls marked as (#)
+movement beyond the edges = Alert Cannot Move beyond the maze
+showing map = Succsefully Shown Image of Map
+succesful movement = Success - You have reached the Exit point
