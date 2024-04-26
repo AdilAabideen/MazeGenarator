@@ -409,6 +409,7 @@ bool validateMovement(Maze *maze, int x, int y){
             return true;
             break;
     }
+    return false ;
 }
 
 
