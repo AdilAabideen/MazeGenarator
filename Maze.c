@@ -21,7 +21,8 @@ typedef struct
 {
     int startPoint_x;
     int startPoint_y;
-    char **mazeGrid ; // Pointer to pointer for the dynamic 2d array
+    // Pointer to pointer for the dynamic 2d array
+    char **mazeGrid ;
     int width, length;
 
 }Maze;
@@ -34,7 +35,6 @@ typedef struct
 } Gamer;
 
 
-
 /**
  * @brief Sets the Players position based on the coordinates supplied to it 
  *
@@ -44,18 +44,18 @@ typedef struct
  * @param firstTime If 1 it is first time, 0 is for any other time
  */
 void setPlayerPosition(int x, int y, Maze *maze, Gamer *gamer, int firstTime){
-    // Counties if gamer exists
+    
     if (gamer != NULL) {
+
         gamer->x = x;
         gamer->y = y;
+
         // If its the first time setting then it sets it in Maze struct
         if (firstTime == 1){
             maze->startPoint_x = gamer->x ;
             maze->startPoint_y = gamer->y ;
         }
-    }
-
-    
+    }   
 }
 
 
@@ -66,12 +66,10 @@ void setPlayerPosition(int x, int y, Maze *maze, Gamer *gamer, int firstTime){
  * @return True if it is allowed, False if not 
  */
 bool isValidCharacter(char c) {
-    // Returns true if acceptable
+
+    // Returns true if acceptable character
     return c == 'S' || c == 'E' || c == '#' || c == ' ' || c == '\n';
 }
-
-
-
 
 
 /**
@@ -94,11 +92,11 @@ bool checkMaze(const char *filename){
     bool sFound = false;
     bool eFound = false;
 
-    // Open the file in read mode
+    
     file = fopen(filename, "r");
 
-    // Read the file line by line
     while (fgets(buffer, sizeof(buffer), file)) {
+
         // Remove the newline character at the end if it exists
         buffer[strcspn(buffer, "\n")] = 0;
         currentLength = strlen(buffer);
@@ -109,10 +107,12 @@ bool checkMaze(const char *filename){
                 validCharacters = false;
                 break;
             }
+
             // Check if they found Start Point
             if ((buffer[i] == 'S') && sFound == false){
                 sFound = true;
             }
+
             // Check if they find the End Point
             if ((buffer[i] == 'E') && eFound == false){
                 eFound = true;
@@ -122,7 +122,6 @@ bool checkMaze(const char *filename){
         if (!validCharacters) {
             break;
         }
-
         if (lineNumber == 0) {
             // Set the initial line length
             lineLength = currentLength;  
@@ -137,7 +136,6 @@ bool checkMaze(const char *filename){
         lineNumber++;  
     }
 
-    // Close the file
     fclose(file);
 
     // Check the dimensions are within the specified bounds
@@ -145,14 +143,10 @@ bool checkMaze(const char *filename){
         withinBounds = false;
     }
 
-
-    // Return true if the file is consistent and within bounds and All characters found and valdi , else false
+    // Return true if the file is consistent and within bounds and All characters found and valid , else false
     return consistent && withinBounds && validCharacters && sFound && eFound ;
 
-
 }
-
-
 
 
 /**
@@ -162,6 +156,7 @@ bool checkMaze(const char *filename){
  * @return True if it is allowed, False if not 
  */
 bool startCheckMaze(const char *filename){
+
     FILE *file;
     file = fopen(filename, "r");
 
@@ -190,34 +185,33 @@ bool startCheckMaze(const char *filename){
 }
 
 
-
 /**
  * @brief Checks if the file is allowed, by splitting up the tasks into 2
  *
- * @param filename The file of the maze
+ * @param filename The pointer to the file to be checked
  * @return True if it is allowed, False if not 
  */
 bool checkFile(const char *filename){
     
-    // get values of both checks for validation
+    // Get values of both checks for validation
     bool firstCheck = startCheckMaze(filename);
     bool secondCheck = checkMaze(filename);
 
     // Exit with error code if validation fails
     if (firstCheck == false){
+        // File Check
         exit(EXIT_FILE_ERROR);
     }
 
     if (secondCheck == false){
+        // Maze Check
         exit(EXIT_MAZE_ERROR);
     }
 
-    // Return values in AND operation 
+    // If both true return true else false
     return firstCheck && secondCheck ;
     
-
 }
-
 
 
 /**
@@ -233,14 +227,17 @@ void readMaze(Maze *maze, const char *filename, Gamer *gamer){
     checkFile(filename);
     FILE *file = fopen(filename, "r");
     
-    char buffer[MAX_SIZE + 1];  // Buffer to hold each line
+    // Initialise variable to Loop
+    char buffer[MAX_SIZE + 1];  
     int y = 0;
-    
 
     // Read file line and assing each character to 2d Array
     while (fgets(buffer, sizeof(buffer), file) && y < maze->length) {
+
         // Remove the newline character
-        buffer[strcspn(buffer, "\n")] = '\0';  
+        buffer[strcspn(buffer, "\n")] = '\0'; 
+
+        // Length of line is width of Maze 
         int lineLength = strlen(buffer);
         // Iterate over each character in the line
         for (int x = 0; x < lineLength && x < MAX_SIZE; x++) {
@@ -248,16 +245,13 @@ void readMaze(Maze *maze, const char *filename, Gamer *gamer){
             if (maze->mazeGrid[y][x] == 'S'){
                 // calling setPlayerPosition to set start Point
                 setPlayerPosition(x,y,maze,gamer,1); 
-
             }
         }
         y++;
     }
-    
     fclose(file);
 
 }
-
 
 
 /**
@@ -276,9 +270,8 @@ void freeMaze(Maze *maze) {
 }
 
 
-
 /**
- * @brief Sets the Width and LEngth of the maze ready for memeory allocation
+ * @brief Sets the Width and length of the maze ready for memeory allocation
  *
  * @param maze The pointer to the Maze for memory to be allocated to
  * @param filename The pointer to the file to be looped through
@@ -294,9 +287,10 @@ void setLengthWidth(Maze *maze, const char *filename){
     char buffer[MAX_SIZE + 1];  // Buffer to hold each line
     int y = 0;
 
-    // Go trhough file to find the width and length of the maze to dynamically allocate the memory
+    // Loop through file to find the width and length of the maze to dynamically allocate the memory
     while (fgets(buffer, sizeof(buffer), file) && y < MAX_SIZE) {
-        buffer[strcspn(buffer, "\n")] = '\0';  // Remove the newline character
+        // Removing newline character
+        buffer[strcspn(buffer, "\n")] = '\0';  
         int lineLength = strlen(buffer);
         if ( y== 0 ){
             // Assign width using pointers
@@ -310,7 +304,6 @@ void setLengthWidth(Maze *maze, const char *filename){
 }
 
 
-
 /**
  * @brief Creates the maze and Allocates memory dynamically to the 2d grid
  *
@@ -322,7 +315,7 @@ void createMaze(Maze *maze){
     maze->mazeGrid = malloc(maze->length * sizeof(char*));
     if (maze->mazeGrid == NULL) {
         fprintf(stderr, "Failed to allocate memory for maze grid\n");
-        // Cleanup
+        // Cleanup if error occurs
         free(maze);
         exit(EXIT_MAZE_ERROR);
     }
@@ -332,7 +325,7 @@ void createMaze(Maze *maze){
         maze->mazeGrid[i] = malloc((maze->width + 1) * sizeof(char)); // +1 for '\0'
         if (maze->mazeGrid[i] == NULL) {
             fprintf(stderr, "Failed to allocate memory for grid row %d\n", i);
-            // Cleanup previously allocated rows by freeing the memory
+            // Cleanup previously allocated rows by freeing the memory if error occurs
             for (int j = 0; j < i; j++) {
                 free(maze->mazeGrid[j]);
             }
@@ -341,8 +334,6 @@ void createMaze(Maze *maze){
             exit(EXIT_MAZE_ERROR);
         }
     }
-    
-    
 }
 
 
@@ -369,7 +360,6 @@ void printMaze(const Maze *maze, const Gamer *gamer) {
         // Each row on a newline
         printf("\n");  
     }
-
 }
 
 
@@ -386,6 +376,7 @@ bool validateMovement(Maze *maze, int x, int y){
     // If the user is trying to move beyond the edges
     if (x < 0 || x >= maze->width || y < 0 || y >= maze->length){
         printf("You cannot move this way, you cannot go beyond the edges - Please try again\n");
+        // Return False as failiure
         return false;
     }
 
@@ -397,10 +388,10 @@ bool validateMovement(Maze *maze, int x, int y){
             printf("Cannot move into a wall, # - Please try again \n");
             return false;
             break;
-        // IF it is the End Point
+        // If it is the End Point
         case 'E':
             printf("Congratulations You have reached the end point and won the game !! \n");
-            // Free memory if End point is foun
+            // Free memory if End point is found
             freeMaze(maze);
             exit(EXIT_SUCCESS);
             return false;
@@ -409,6 +400,8 @@ bool validateMovement(Maze *maze, int x, int y){
             return true;
             break;
     }
+
+    // Incase if all fails
     return false ;
 }
 
@@ -429,33 +422,30 @@ void movePlayer(Maze *maze, Gamer *gamer, char movement){
 
     // Change in coordinates depending on input
     switch(movement){
-    case 'W':
-        new_y = gamer->y - 1;
-        break;
-    case 'A':
-        new_x = gamer->x - 1 ;
-        break;
-    case 'S':
-        new_y = gamer->y + 1;
-        break;
-    case 'D':
-        new_x = gamer->x + 1 ;
-        break;
+        case 'W':
+            new_y = gamer->y - 1;
+            break;
+        case 'A':
+            new_x = gamer->x - 1 ;
+            break;
+        case 'S':
+            new_y = gamer->y + 1;
+            break;
+        case 'D':
+            new_x = gamer->x + 1 ;
+            break;
     }
 
-    // Validation then setting new values
+    // Validation to check future movement
     validatedMovement = validateMovement(maze, new_x, new_y);
     if(validatedMovement){
+        // Complete the move
         setPlayerPosition(new_x, new_y, maze, gamer, 0);
     }
 }
 
 
-
-
-
 int main(int argc, char *argv[]){
-
 
     char userChar ;
 
@@ -468,7 +458,9 @@ int main(int argc, char *argv[]){
     // we first allocate memory for the Maze and gamer structs
     Maze maze;
     Gamer gamer ;
-    setLengthWidth(&maze, argv[1]); // Find out width and lengths
+
+    // Find out width and length to allocate dynamically
+    setLengthWidth(&maze, argv[1]); 
     createMaze(&maze);
 
     // Call read maze to read in the maze and validate to setup the game
